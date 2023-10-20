@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.8.26)  20 OCT 2023 14:48
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex 2023.8.26)  20 OCT 2023 15:12
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -493,7 +493,7 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 Here is how much of TeX's memory you used:
  13323 strings out of 476683
  228456 string characters out of 5804047
- 1845018 words of memory out of 5000000
+ 1844018 words of memory out of 5000000
  33380 multiletter control sequences out of 15000+600000
  516105 words of font info for 51 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
