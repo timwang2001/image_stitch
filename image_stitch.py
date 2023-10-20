@@ -1,7 +1,7 @@
 '''
 Author: Wang Taorui
 Date: 2023-10-20 14:50:22
-LastEditTime: 2023-10-20 16:08:15
+LastEditTime: 2023-10-20 16:08:59
 LastEditors: Wang Taorui
 Description: 
 FilePath: /assignment2/image_stitch.py
