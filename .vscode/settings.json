@@ -1,0 +1,62 @@
+{
+	"latex-workshop.latex.recipes": [
+		 {
+		   "name": "xelatex",
+		   "tools": [
+			 "xelatex"
+		   ]
+		 },
+		 {
+		   "name": "xe*2",
+		   "tools": [
+			 "xelatex",
+			 "xelatex"
+		   ]
+		 },
+		 {
+		   "name": "xelatex -> bibtex -> xelatex*2",
+		   "tools": [
+			 "xelatex",
+			 "bibtex",
+			 "xelatex",
+			 "xelatex"
+		   ]
+		 }
+	   ],
+	   "latex-workshop.latex.tools": [
+		 {
+		   "name": "latexmk",
+		   "command": "latexmk",
+		   "args": [
+			"--shell-escape", 
+			 "-synctex=1",
+			 "-interaction=nonstopmode",
+			 "-file-line-error",
+			 "-pdf",
+			 "%DOC%"
+		   ]
+		 },
+		 {
+		   "name": "xelatex",
+		   "command": "xelatex",
+		   "args": [
+			"--shell-escape", 
+			 "-synctex=1",
+			 "-interaction=nonstopmode",
+			 "-file-line-error",
+			 "-8bit",
+			 "%DOC%"
+		   ]
+		 },
+		 {
+		   "name": "bibtex",
+		   "command": "bibtex",
+		   "args": [
+			"--shell-escape", 
+			 "%DOCFILE%"
+		   ]
+		 }
+	   ],
+	   "latex-workshop.view.pdf.viewer": "tab"
+   }
+   
