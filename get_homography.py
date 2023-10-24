@@ -1,7 +1,7 @@
 '''
 Author: Wang Taorui
 Date: 2023-10-23 19:39:36
-LastEditTime: 2023-10-24 19:01:03
+LastEditTime: 2023-10-24 19:16:18
 LastEditors: Wang Taorui
 Description: 
 FilePath: /assignment2/get_homography.py
@@ -10,9 +10,9 @@ from cv2implment import get_pointset
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-
-img1 = cv.imread('image_pairs/image pairs_03_01.jpg')
-img2 = cv.imread('image_pairs/image pairs_03_02.jpg')
+p=3
+img1 = cv.imread('image_pairs/image pairs_0%d_01.jpg'%p)
+img2 = cv.imread('image_pairs/image pairs_0%d_02.jpg'%p)
 
 pointset,keypoint1,keypoint2 = get_pointset(img1, img2)
 # RANSAC算法计算单应性矩阵
@@ -39,7 +39,7 @@ tge_pts = np.float32([keypoint2[m.trainIdx].pt for m in pointset]).reshape(-1, 1
 # U, S, Vt = np.linalg.svd(A)
 # H = Vt[-1].reshape(3, 3)
 # H /= H[2,2]
-M, mask = cv.findHomography(src_pts, tge_pts, cv.RANSAC, 2)
+M, mask = cv.findHomography(src_pts, tge_pts, cv.RANSAC, 10)
 # print(H)
 ## get homography matrix done
 
@@ -112,7 +112,7 @@ warpimg[0:img1.shape[0], 0:img1.shape[1]] = res
 # img3 = cv.cvtColor(direct, cv.COLOR_BGR2RGB)
 # plt.imshow(img3), plt.show()
 img4 = cv.cvtColor(warpimg, cv.COLOR_BGR2RGB)
-plt.imshow(img4), plt.show()
-
+# plt.imshow(img4), plt.show()
+cv.imwrite('image_pairs/'+'image pairs_0%d.jpg'%p,warpimg)
 
 # cv.waitKey(0)

@@ -1,11 +1,20 @@
+'''
+Author: Wang Taorui
+Date: 2023-10-24 19:16:22
+LastEditTime: 2023-10-24 19:19:37
+LastEditors: Wang Taorui
+Description: 
+FilePath: /assignment2/new.py
+'''
 # 图像拼接
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 MIN = 10
-pair = 1
-img1 = cv.imread('image_pairs/image pairs_0%d_01.jpg'%pair)
-img2 = cv.imread('image_pairs/image pairs_0%d_02.jpg'%pair)
+pair = 2
+ext = "png"
+img1 = cv.imread('image_pairs/image pairs_0%d_01.%s'%(pair,ext))
+img2 = cv.imread('image_pairs/image pairs_0%d_02.%s'%(pair,ext))
 
 # 统一图像大小
 height1 = int(img1.shape[0])
@@ -41,10 +50,7 @@ def get_pointset(img1,img2):
 
 if __name__ == '__main__':
 	good,kp1,kp2 = get_pointset(img1,img2)
-	# 可视化特征匹配结果,并保存
-	pic3 = cv.drawMatches(img1=img1, keypoints1=kp1, img2=img2, keypoints2=kp2, matches1to2=good, outImg=None)
-	cv.imshow("a", pic3)
-	# cv.waitKey(0)
+
 
 	
 	# RANSAC算法计算单应性矩阵
@@ -53,14 +59,8 @@ if __name__ == '__main__':
 		tge_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
 		
 		M, mask = cv.findHomography(src_pts, tge_pts, cv.RANSAC, 2)
-		print(M)
-		# 源图像img2图像扭曲（透视变换）
 		warpimg = cv.warpPerspective(img2, np.linalg.inv(M), (img1.shape[1] + img2.shape[1], img2.shape[0]))
-		cv.namedWindow("warpimg", cv.WINDOW_NORMAL)
-		cv.imshow('warpimg',warpimg)
 		# 拼接图像
-		direct = warpimg.copy()
-		direct[0:img1.shape[0], 0:img1.shape[1]] = img1
 		rows, cols = img1.shape[:2]
 	
 		left = 0
@@ -93,12 +93,13 @@ if __name__ == '__main__':
 	
 	
 		warpimg[0:img1.shape[0], 0:img1.shape[1]] = res
-		img3 = cv.cvtColor(direct, cv.COLOR_BGR2RGB)
-		plt.imshow(img3), plt.show()
+
 		img4 = cv.cvtColor(warpimg, cv.COLOR_BGR2RGB)
 		plt.imshow(img4), plt.show()
-		cv.waitKey()
-		cv.destroyAllWindows()
+		cv.imwrite('image_pairs/'+'image pairs_0%d.%s'%(pair,ext),warpimg)
+
+		# cv.waitKey()
+		# cv.destroyAllWindows()
 	
 	else:
 		print("not enough matches!")
