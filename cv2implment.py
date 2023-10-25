@@ -3,7 +3,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 MIN = 10
-pair = 1
+pair = 4
 img1 = cv.imread('image_pairs/image pairs_0%d_01.jpg'%pair)
 img2 = cv.imread('image_pairs/image pairs_0%d_02.jpg'%pair)
 

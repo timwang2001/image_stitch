@@ -1,7 +1,7 @@
 '''
 Author: Wang Taorui
 Date: 2023-10-23 19:39:36
-LastEditTime: 2023-10-24 19:16:18
+LastEditTime: 2023-10-25 14:52:40
 LastEditors: Wang Taorui
 Description: 
 FilePath: /assignment2/get_homography.py
@@ -10,9 +10,9 @@ from cv2implment import get_pointset
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-p=3
-img1 = cv.imread('image_pairs/image pairs_0%d_01.jpg'%p)
-img2 = cv.imread('image_pairs/image pairs_0%d_02.jpg'%p)
+p=1
+img1 = cv.imread('image_pairs/image pairs_01_01.jpg')
+img2 = cv.imread('image_pairs/image pairs_01_02.jpg')
 
 pointset,keypoint1,keypoint2 = get_pointset(img1, img2)
 # RANSAC算法计算单应性矩阵
@@ -71,12 +71,13 @@ for y in range(img2.shape[0]):
             # Copy the pixel value from img2 to the output image
             output_image[output_y, output_x] = img2[y, x]
 
-warpimg = cv.warpPerspective(img2, np.linalg.inv(M), (img1.shape[1] + img2.shape[1], img2.shape[0]))
+warpimg = cv.warpPerspective(img2, np.linalg.inv(M), (output_width,output_height))
 
 # warpimg = output_image.copy()
 
 rows, cols = img1.shape[:2]
-
+print(rows, cols)
+print(warpimg.shape)
 left = 0
 right = cols
 
@@ -108,9 +109,19 @@ for row in range(0, rows):
             res[row, col] = np.clip(img1[row, col] * (1 - alpha) + warpimg[row, col] * alpha, 0, 255)
 
 
+# 裁剪拼接后的图像以删除黑色边界
+def crop_black_borders(image):
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    _, thresh = cv.threshold(gray, 1, 255, cv.THRESH_BINARY)
+    contours, hierarchy = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
+    x, y, w, h = cv.boundingRect(contours[0])
+    cropped_image = image[y:y + h, x:x + w]
+    return cropped_image
+
 warpimg[0:img1.shape[0], 0:img1.shape[1]] = res
 # img3 = cv.cvtColor(direct, cv.COLOR_BGR2RGB)
 # plt.imshow(img3), plt.show()
+warpimg = crop_black_borders(warpimg)
 img4 = cv.cvtColor(warpimg, cv.COLOR_BGR2RGB)
 # plt.imshow(img4), plt.show()
 cv.imwrite('image_pairs/'+'image pairs_0%d.jpg'%p,warpimg)

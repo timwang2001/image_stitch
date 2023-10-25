@@ -1,53 +1,48 @@
 '''
 Author: Wang Taorui
 Date: 2023-10-20 14:50:22
-LastEditTime: 2023-10-20 16:08:59
+LastEditTime: 2023-10-25 14:38:10
 LastEditors: Wang Taorui
 Description: 
 FilePath: /assignment2/image_stitch.py
 '''
+import cv2
 import numpy as np
-from scipy.signal import convolve2d
-import matplotlib.pyplot as plt
 
-def harris_corner_detector(image, threshold=0.01):
-    # 计算图像的梯度
-    dx = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
-    dy = dx.T
+# Load two images to be stitched
+image1 = cv2.imread('image_pairs/image pairs_04_01.jpg')
+image2 = cv2.imread('image_pairs/image pairs_04_02.jpg')
 
-    Ix = convolve2d(image, dx, mode='same')
-    Iy = convolve2d(image, dy, mode='same')
+# Detect keypoints and compute descriptors
+detector = cv2.SIFT_create()
+keypoints1, descriptors1 = detector.detectAndCompute(image1, None)
+keypoints2, descriptors2 = detector.detectAndCompute(image2, None)
 
-    # 计算 Harris 角点响应函数 R
-    Ix2 = Ix * Ix
-    Iy2 = Iy * Iy
-    Ixy = Ix * Iy
+# Match keypoints using a descriptor matcher (e.g., FLANN or BFMatcher)
+matcher = cv2.BFMatcher()
+matches = matcher.knnMatch(descriptors1, descriptors2, k=2)
 
-    kernel = np.ones((3, 3))
-    Sxx = convolve2d(Ix2, kernel, mode='same')
-    Syy = convolve2d(Iy2, kernel, mode='same')
-    Sxy = convolve2d(Ixy, kernel, mode='same')
+# Apply Lowe's ratio test to filter good matches
+good_matches = []
+for m, n in matches:
+    if m.distance < 0.75 * n.distance:
+        good_matches.append(m)
 
-    det_M = Sxx * Syy - Sxy * Sxy
-    trace_M = Sxx + Syy
-    R = det_M - 0.04 * (trace_M ** 2)
+# Get corresponding points in both images
+src_pts = np.float32([keypoints1[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+dst_pts = np.float32([keypoints2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
 
-    # 根据阈值找到角点
-    corners = (R > threshold * R.max()).nonzero()
+# Find the Homography matrix using RANSAC
+H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
 
-    return corners
+# Warp the second image to align with the first
+result = cv2.warpPerspective(image2, H, (image1.shape[1] + image2.shape[1], image2.shape[0]))
 
-# 读取图像
-image = plt.imread('image_pairs/image pairs_01_01.jpg')
-image = np.mean(image, axis=2)  # 转换为灰度图
+# Copy the first image to the result
+result[0:image1.shape[0], 0:image1.shape[1]] = image1
 
-# 使用 Harris 角点检测
-corners = harris_corner_detector(image)
-
-# 在图像上标记角点
-image_with_corners = image.copy()
-image_with_corners[corners] = 255  # 将角点设置为白色
-
-# 显示图像和标记的角点
-plt.imshow(image_with_corners, cmap='gray')
-plt.show()
+# Save or display the stitched image
+cv2.imwrite('panorama.jpg', result)
+cv2.imshow('Stitched Image', result)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
